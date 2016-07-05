@@ -1,0 +1,18 @@
+---
+Language: Cpp
+BasedOnStyle: WebKit
+AllowAllParametersOfDeclarationOnNextLine: true
+BinPackArguments: false
+BinPackParameters: false
+ColumnLimit: 100
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+Cpp11BracedListStyle: true
+AllowShortBlocksOnASingleLine: false
+AllowShortFunctionsOnASingleLine: false
+AlignAfterOpenBracket: true
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakTemplateDeclarations: true
+IndentCaseLabels: true
+PenaltyReturnTypeOnItsOwnLine: 300
+NamespaceIndentation: All
+Standard: Cpp11
