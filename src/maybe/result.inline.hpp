@@ -97,11 +97,14 @@ constexpr void maybe::result<T, E>::clear() noexcept
 }
 
 template <typename T, typename E>
-template <typename R>
-constexpr maybe::result<R, E> maybe::result<T, E>::map(std::function<R(T v)> closure) noexcept
+template <typename F>
+constexpr auto maybe::result<T, E>::map(F f) noexcept
+    -> maybe::result<decltype(f(std::declval<T>())), E>
 {
+    typedef maybe::result<decltype(f(std::declval<T>())), E> return_result_t;
+
     if (is_err()) {
-        return maybe::result<R, E>::err(err_value());
+        return return_result_t::err(std::forward<E>(err_value()));
     }
-    return maybe::result<R, E>::ok(closure(ok_value()));
+    return return_result_t::ok(f(std::forward<T>(ok_value())));
 };

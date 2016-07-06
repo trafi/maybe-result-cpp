@@ -21,7 +21,7 @@ TEST_CASE("result_chaining")
     SECTION("converts result A to result B")
     {
         auto a = result<A, int>::ok(A("hello"));
-        auto b = a.map<B>([](const A& v) { return B(v.value); });
+        auto b = a.map([](A v) { return B(v.value); });
         REQUIRE(b);
         REQUIRE(b.ok_value().value == "hello");
     }

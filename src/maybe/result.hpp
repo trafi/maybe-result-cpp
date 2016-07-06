@@ -193,8 +193,8 @@ namespace maybe {
             return std::addressof(err_val);
         }
 
-        template <typename R>
-        constexpr result<R, E> map(std::function<R(T v)> closure) noexcept;
+        template <typename F>
+        constexpr auto map(F f) noexcept -> maybe::result<decltype(f(std::declval<T>())), E>;
 
     private:
         constexpr void copy_from(const result<T, E>& other) noexcept;
