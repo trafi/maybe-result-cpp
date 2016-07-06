@@ -6,6 +6,7 @@ add_executable(${TARGET}
         main.cpp
         result_tests.cpp
         result_map_tests.cpp
+        result_map_err_tests.cpp
         result_and_then_tests.cpp
         )
 

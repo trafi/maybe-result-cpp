@@ -195,11 +195,40 @@ namespace maybe {
             return std::addressof(err_val);
         }
 
+        /**
+         * Maps a result<T, E> to result<U, E> (where U is return value of F(T)) by applying a function F to a
+         * contained ok value, leaving an err value untouched.
+         *
+         * This function can be used to compose the results of two functions.
+         *
+         * @param f F(T) -> U
+         * @return maybe::result<U, E>
+         */
         template <typename F>
         constexpr auto map(F f) noexcept -> maybe::result<typename std::result_of<F(T)>::type, E>;
 
+        /**
+         * Maps a result<T, E> to result<T, U> (where U is return value of F(E)) by applying a function to a
+         * contained err value, leaving an ok value untouched.
+         *
+         * This function can be used to pass through a successful result while changing an error.
+         *
+         * @param f F(E) -> U
+         * @return maybe::result<T, U>
+         */
         template <typename F>
-        constexpr auto and_then(F f) noexcept -> typename std::result_of<F(T)>::type;
+        constexpr auto map_err(F f) noexcept -> maybe::result<T, typename std::result_of<F(E)>::type>;
+
+        /**
+         * Calls op if the result is ok, otherwise returns the err value of self.
+         *
+         * This function can be used for control flow based on result values.
+         *
+         * @param f F(T) -> maybe::result<U, E>
+         * @return maybe::result<U, E>
+         */
+        template <typename F>
+        constexpr auto and_then(F op) noexcept -> typename std::result_of<F(T)>::type;
 
     private:
         constexpr void copy_from(const result<T, E>& other) noexcept;
