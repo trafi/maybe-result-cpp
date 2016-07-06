@@ -50,6 +50,8 @@ namespace maybe {
     template <typename T, typename E>
     class result final {
     public:
+        typedef T ok_type;
+
         result() : tag(internal::Value::NONE)
         {
         }
@@ -194,7 +196,10 @@ namespace maybe {
         }
 
         template <typename F>
-        constexpr auto map(F f) noexcept -> maybe::result<decltype(f(std::declval<T>())), E>;
+        constexpr auto map(F f) noexcept -> maybe::result<typename std::result_of<F(T)>::type, E>;
+
+        template <typename F>
+        constexpr auto and_then(F f) noexcept -> typename std::result_of<F(T)>::type;
 
     private:
         constexpr void copy_from(const result<T, E>& other) noexcept;
