@@ -60,10 +60,22 @@ namespace maybe {
             init_ok(std::forward<T>(value));
         }
 
+        /** ok initializer */
+        result(const T& value, internal::Placeholder) : tag(internal::Value::OK)
+        {
+            init_ok(value);
+        }
+
         /** err initializer */
         result(internal::Placeholder, E&& value) : tag(internal::Value::ERR)
         {
-            init_err(std::forward<T>(value));
+            init_err(std::forward<E>(value));
+        }
+
+        /** err initializer */
+        result(internal::Placeholder, const E& value) : tag(internal::Value::ERR)
+        {
+            init_err(value);
         }
 
         /** copy constructor */
@@ -106,10 +118,22 @@ namespace maybe {
             return result<T, E>(std::forward<T>(value), internal::Placeholder{});
         }
 
+        /** helper constructor for ok value */
+        constexpr static result<T, E> ok(const T& value) noexcept
+        {
+            return result<T, E>(value, internal::Placeholder{});
+        }
+
         /** helper constructor for err value */
         constexpr static result<T, E> err(E&& err) noexcept
         {
             return result<T, E>(internal::Placeholder{}, std::forward<E>(err));
+        }
+
+        /** helper constructor for err value */
+        constexpr static result<T, E> err(const E& err) noexcept
+        {
+            return result<T, E>(internal::Placeholder{}, err);
         }
 
         constexpr bool is_ok() const noexcept
@@ -134,14 +158,12 @@ namespace maybe {
 
         constexpr E const& err_value() const&
         {
-            return is_err() ? err_val
-                            : (throw bad_result_access("bad err result access"), err_val);
+            return is_err() ? err_val : (throw bad_result_access("bad err result access"), err_val);
         }
 
         constexpr E& err_value() &
         {
-            return is_err() ? err_val
-                            : (throw bad_result_access("bad err result access"), err_val);
+            return is_err() ? err_val : (throw bad_result_access("bad err result access"), err_val);
         }
 
         template <class V>
@@ -171,11 +193,16 @@ namespace maybe {
             return std::addressof(err_val);
         }
 
+        template <typename R>
+        constexpr result<R, E> map(std::function<R(T v)> closure) noexcept;
+
     private:
         constexpr void copy_from(const result<T, E>& other) noexcept;
         constexpr void set_from(result<T, E>& other) noexcept;
         constexpr void init_ok(T&& value) noexcept;
-        constexpr void init_err(T&& value) noexcept;
+        constexpr void init_ok(const T& value) noexcept;
+        constexpr void init_err(E&& value) noexcept;
+        constexpr void init_err(const E& value) noexcept;
         constexpr void clear() noexcept;
 
         internal::Value tag;

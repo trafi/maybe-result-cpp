@@ -38,7 +38,7 @@ private:
     std::function<void()> destructor_fun;
 };
 
-TEST_CASE("maybe_result_tests")
+TEST_CASE("result")
 {
     SECTION("created ok result returns ok value")
     {

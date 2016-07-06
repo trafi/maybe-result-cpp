@@ -15,14 +15,14 @@
 template <typename T, typename E>
 constexpr void maybe::result<T, E>::copy_from(const result<T, E>& other) noexcept
 {
-    using maybe::internal::Value;
+    using ::maybe::internal::Value;
 
     switch (other.tag) {
         case Value::OK:
-            init_ok(*other.ok_dataptr());
+            init_ok(other.ok_val);
             break;
         case Value::ERR:
-            init_err(*other.err_dataptr());
+            init_err(other.err_val);
             break;
         default:
             tag = Value::NONE;
@@ -33,7 +33,7 @@ constexpr void maybe::result<T, E>::copy_from(const result<T, E>& other) noexcep
 template <typename T, typename E>
 constexpr void maybe::result<T, E>::set_from(result<T, E>& other) noexcept
 {
-    using maybe::internal::Value;
+    using ::maybe::internal::Value;
 
     switch (other.tag) {
         case Value::OK:
@@ -44,7 +44,7 @@ constexpr void maybe::result<T, E>::set_from(result<T, E>& other) noexcept
             break;
         default:
             tag = Value::NONE;
-            break;
+            return;
     }
     other.tag = Value::NONE;
 }
@@ -52,28 +52,42 @@ constexpr void maybe::result<T, E>::set_from(result<T, E>& other) noexcept
 template <typename T, typename E>
 constexpr void maybe::result<T, E>::init_ok(T&& value) noexcept
 {
-    tag = maybe::internal::Value::OK;
+    tag = ::maybe::internal::Value::OK;
     ::new (static_cast<void*>(ok_dataptr())) T(std::forward<T>(value));
 }
 
 template <typename T, typename E>
-constexpr void maybe::result<T, E>::init_err(T&& value) noexcept
+constexpr void maybe::result<T, E>::init_ok(const T& value) noexcept
 {
-    tag = maybe::internal::Value::ERR;
-    ::new (static_cast<void*>(err_dataptr())) T(std::forward<T>(value));
+    tag = ::maybe::internal::Value::OK;
+    ::new (static_cast<void*>(ok_dataptr())) T(value);
+}
+
+template <typename T, typename E>
+constexpr void maybe::result<T, E>::init_err(E&& value) noexcept
+{
+    tag = ::maybe::internal::Value::ERR;
+    ::new (static_cast<void*>(err_dataptr())) E(std::forward<E>(value));
+}
+
+template <typename T, typename E>
+constexpr void maybe::result<T, E>::init_err(const E& value) noexcept
+{
+    tag = ::maybe::internal::Value::ERR;
+    ::new (static_cast<void*>(err_dataptr())) E(value);
 }
 
 template <typename T, typename E>
 constexpr void maybe::result<T, E>::clear() noexcept
 {
-    using maybe::internal::Value;
+    using ::maybe::internal::Value;
 
     switch (tag) {
         case Value::OK:
             (&this->ok_val)->T::~T();
             tag = Value::NONE;
             break;
-        case internal::Value::ERR:
+        case Value::ERR:
             (&this->err_val)->E::~E();
             tag = Value::NONE;
             break;
@@ -81,3 +95,13 @@ constexpr void maybe::result<T, E>::clear() noexcept
             break;
     }
 }
+
+template <typename T, typename E>
+template <typename R>
+constexpr maybe::result<R, E> maybe::result<T, E>::map(std::function<R(T v)> closure) noexcept
+{
+    if (is_err()) {
+        return maybe::result<R, E>::err(err_value());
+    }
+    return maybe::result<R, E>::ok(closure(ok_value()));
+};
