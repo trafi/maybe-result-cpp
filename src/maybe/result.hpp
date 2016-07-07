@@ -220,6 +220,9 @@ namespace maybe {
         template <typename F>
         constexpr auto map(F f) noexcept -> maybe::result<typename std::result_of<F(T)>::type, E>;
 
+        template <typename U>
+        constexpr auto map_value(U value) noexcept -> maybe::result<U, E>;
+
         /**
          * Maps a result<T, E> to result<T, U> (where U is return value of F(E)) by applying a
          * function to a

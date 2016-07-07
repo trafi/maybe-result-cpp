@@ -110,6 +110,17 @@ constexpr auto maybe::result<T, E>::map(F f) noexcept
 };
 
 template <typename T, typename E>
+template <typename U>
+constexpr auto maybe::result<T, E>::map_value(U value) noexcept -> maybe::result<U, E>
+{
+    if (is_err()) {
+        return maybe::result<U, E>::err(std::forward<E>(err_value()));
+    }
+
+    return maybe::result<U, E>::ok(std::forward<U>(value));
+};
+
+template <typename T, typename E>
 template <typename F>
 constexpr auto maybe::result<T, E>::map_err(F f) noexcept
     -> maybe::result<T, typename std::result_of<F(E)>::type>
