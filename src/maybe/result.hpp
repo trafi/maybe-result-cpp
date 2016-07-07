@@ -114,6 +114,12 @@ namespace maybe {
             clear();
         };
 
+        /** helper constructor for default ok value */
+        constexpr static result<T, E> default_ok() noexcept
+        {
+            return result<T, E>(T(), internal::Placeholder{});
+        }
+
         /** helper constructor for ok value */
         constexpr static result<T, E> ok(T&& value) noexcept
         {
@@ -124,6 +130,12 @@ namespace maybe {
         constexpr static result<T, E> ok(const T& value) noexcept
         {
             return result<T, E>(value, internal::Placeholder{});
+        }
+
+        /** helper constructor for default err value */
+        constexpr static result<T, E> default_err() noexcept
+        {
+            return result<T, E>(internal::Placeholder{}, E());
         }
 
         /** helper constructor for err value */
@@ -196,7 +208,8 @@ namespace maybe {
         }
 
         /**
-         * Maps a result<T, E> to result<U, E> (where U is return value of F(T)) by applying a function F to a
+         * Maps a result<T, E> to result<U, E> (where U is return value of F(T)) by applying a
+         * function F to a
          * contained ok value, leaving an err value untouched.
          *
          * This function can be used to compose the results of two functions.
@@ -208,7 +221,8 @@ namespace maybe {
         constexpr auto map(F f) noexcept -> maybe::result<typename std::result_of<F(T)>::type, E>;
 
         /**
-         * Maps a result<T, E> to result<T, U> (where U is return value of F(E)) by applying a function to a
+         * Maps a result<T, E> to result<T, U> (where U is return value of F(E)) by applying a
+         * function to a
          * contained err value, leaving an ok value untouched.
          *
          * This function can be used to pass through a successful result while changing an error.
@@ -217,7 +231,8 @@ namespace maybe {
          * @return maybe::result<T, U>
          */
         template <typename F>
-        constexpr auto map_err(F f) noexcept -> maybe::result<T, typename std::result_of<F(E)>::type>;
+        constexpr auto map_err(F f) noexcept
+            -> maybe::result<T, typename std::result_of<F(E)>::type>;
 
         /**
          * Calls op if the result is ok, otherwise returns the err value of self.
@@ -229,6 +244,15 @@ namespace maybe {
          */
         template <typename F>
         constexpr auto and_then(F op) noexcept -> typename std::result_of<F(T)>::type;
+
+        template <typename R>
+        constexpr auto into_err() noexcept -> R
+        {
+            if (is_err()) {
+                return R::err(std::forward<E>(err_value()));
+            }
+            return R::default_ok();
+        };
 
     private:
         constexpr void copy_from(const result<T, E>& other) noexcept;
