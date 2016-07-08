@@ -250,7 +250,7 @@ namespace maybe {
 
         T& ok_value()
         {
-            return is_ok() ? ok_val : (throw bad_optional_access("bad ok result access"), ok_val);
+            return is_ok() ? ok_val : (throw bad_result_access("bad ok result access"), ok_val);
         }
 
         constexpr E const& err_value() const
@@ -261,7 +261,7 @@ namespace maybe {
         E& err_value()
         {
             return is_err() ? err_val
-                            : (throw bad_optional_access("bad err result access"), err_val);
+                            : (throw bad_result_access("bad err result access"), err_val);
         }
 
 #endif
