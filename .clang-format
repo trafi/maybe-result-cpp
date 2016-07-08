@@ -13,6 +13,11 @@ AlignAfterOpenBracket: true
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakTemplateDeclarations: true
 IndentCaseLabels: true
-PenaltyReturnTypeOnItsOwnLine: 300
+PenaltyBreakBeforeFirstCallParameter: 1
+PenaltyBreakComment: 300
+PenaltyBreakFirstLessLess: 120
+PenaltyBreakString: 1000
+PenaltyExcessCharacter: 1000000
+PenaltyReturnTypeOnItsOwnLine: 200
 NamespaceIndentation: All
 Standard: Cpp11

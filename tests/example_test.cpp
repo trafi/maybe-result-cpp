@@ -61,11 +61,11 @@ TEST_CASE("example")
         auto success_result = run(true);
 
         REQUIRE(success_result);
-        REQUIRE(success_result.ok_value() == 4);
+        REQUIRE(4 == success_result.ok_value());
 
         auto error_result = run(false);
 
         REQUIRE(!error_result);
-        REQUIRE(error_result.err_value() == "file not found");
+        REQUIRE("file not found" == error_result.err_value());
     }
 }

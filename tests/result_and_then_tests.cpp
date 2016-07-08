@@ -36,6 +36,6 @@ TEST_CASE("result_and_then")
         auto a = result<A, int>::err(43);
         auto b = a.and_then([](A v) { return result<B, int>::ok(B(v.value + " world")); });
         REQUIRE(!b);
-        REQUIRE(b.err_value() == 43);
+        REQUIRE(43 == b.err_value());
     }
 }

@@ -1,9 +1,6 @@
 #include "catch.hpp"
 
-#include <functional>
 #include <maybe/result.hpp>
-#include <memory>
-#include <sstream>
 
 using maybe::result;
 
@@ -46,7 +43,7 @@ TEST_CASE("result")
         REQUIRE(res.is_ok());
         REQUIRE(!res.is_err());
         REQUIRE(res);
-        REQUIRE(res.ok_value() == 12);
+        REQUIRE(12 == res.ok_value());
 
         auto other_ok = result<int, int>::ok(12);
         REQUIRE(res == other_ok);
@@ -61,7 +58,7 @@ TEST_CASE("result")
         REQUIRE(res.is_err());
         REQUIRE(!res.is_ok());
         REQUIRE(!res);
-        REQUIRE(res.err_value() == 12);
+        REQUIRE(12 == res.err_value());
 
         auto other_err = result<int, int>::err(12);
         REQUIRE(res == other_err);
@@ -77,13 +74,13 @@ TEST_CASE("result")
         REQUIRE(ok != err);
     }
 
-        SECTION("throws exception if invalid value accessed")
-        {
-            auto ok = result<int, int>::ok(12);
-            auto err = result<int, int>::err(12);
-            REQUIRE_THROWS(ok.err_value());
-            REQUIRE_THROWS(err.ok_value());
-        }
+    SECTION("throws exception if invalid value accessed")
+    {
+        auto ok = result<int, int>::ok(12);
+        auto err = result<int, int>::err(12);
+        REQUIRE_THROWS(ok.err_value());
+        REQUIRE_THROWS(err.ok_value());
+    }
 
     SECTION("returns default values")
     {
@@ -194,4 +191,35 @@ TEST_CASE("result")
 
         REQUIRE(ss.str() == "[err]");
     }
+
+#if MAYBE_RESULT_HAS_MOVE_ACCESSORS == 1
+
+    SECTION("ok move accessor works")
+    {
+        std::ostringstream ss;
+
+        {
+            auto val = result<NoCopy, NoCopy>::ok(NoCopy(42, [&] { ss << "[ok]"; }));
+            auto&& other = val.ok_value();
+            REQUIRE(42 == other.get_flag());
+        }
+
+        REQUIRE(ss.str() == "[ok]");
+    }
+
+    SECTION("err move accessor works")
+    {
+        std::ostringstream ss;
+
+        {
+            auto val = result<NoCopy, NoCopy>::err(NoCopy(42, [&] { ss << "[err]"; }));
+            auto&& other = val.err_value();
+            REQUIRE(42 == other.get_flag());
+        }
+
+        REQUIRE(ss.str() == "[err]");
+    }
+
+#endif
+
 }
