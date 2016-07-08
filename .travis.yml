@@ -8,35 +8,47 @@ matrix:
       addons:
         apt:
           sources:
+            - george-edison55-precise-backports
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
+            - cmake
+            - cmake-data
       env: COMPILER=g++-4.9
     - compiler: gcc
       addons:
         apt:
           sources:
+            - george-edison55-precise-backports
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
+            - cmake
+            - cmake-data
       env: COMPILER=g++-5
     - compiler: clang
       addons:
         apt:
           sources:
+            - george-edison55-precise-backports
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
+            - cmake
+            - cmake-data
       env: COMPILER=clang++-3.6
     - compiler: clang
       addons:
         apt:
           sources:
+            - george-edison55-precise-backports
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
+            - cmake
+            - cmake-data
       env: COMPILER=clang++-3.7
 
 before_install:
