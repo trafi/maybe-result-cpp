@@ -13,7 +13,7 @@
 #include "result.hpp"
 
 template <typename T, typename E>
-constexpr void maybe::result<T, E>::copy_from(const result<T, E>& other) noexcept
+void maybe::result<T, E>::copy_from(const result<T, E>& other) noexcept
 {
     using ::maybe::internal::Value;
 
@@ -31,7 +31,7 @@ constexpr void maybe::result<T, E>::copy_from(const result<T, E>& other) noexcep
 }
 
 template <typename T, typename E>
-constexpr void maybe::result<T, E>::set_from(result<T, E>& other) noexcept
+void maybe::result<T, E>::set_from(result<T, E>& other) noexcept
 {
     using ::maybe::internal::Value;
 
@@ -50,35 +50,35 @@ constexpr void maybe::result<T, E>::set_from(result<T, E>& other) noexcept
 }
 
 template <typename T, typename E>
-constexpr void maybe::result<T, E>::init_ok(T&& value) noexcept
+void maybe::result<T, E>::init_ok(T&& value) noexcept
 {
     tag = ::maybe::internal::Value::OK;
     ::new (static_cast<void*>(ok_dataptr())) T(std::forward<T>(value));
 }
 
 template <typename T, typename E>
-constexpr void maybe::result<T, E>::init_ok(const T& value) noexcept
+void maybe::result<T, E>::init_ok(const T& value) noexcept
 {
     tag = ::maybe::internal::Value::OK;
     ::new (static_cast<void*>(ok_dataptr())) T(value);
 }
 
 template <typename T, typename E>
-constexpr void maybe::result<T, E>::init_err(E&& value) noexcept
+void maybe::result<T, E>::init_err(E&& value) noexcept
 {
     tag = ::maybe::internal::Value::ERR;
     ::new (static_cast<void*>(err_dataptr())) E(std::forward<E>(value));
 }
 
 template <typename T, typename E>
-constexpr void maybe::result<T, E>::init_err(const E& value) noexcept
+void maybe::result<T, E>::init_err(const E& value) noexcept
 {
     tag = ::maybe::internal::Value::ERR;
     ::new (static_cast<void*>(err_dataptr())) E(value);
 }
 
 template <typename T, typename E>
-constexpr void maybe::result<T, E>::clear() noexcept
+void maybe::result<T, E>::clear() noexcept
 {
     using ::maybe::internal::Value;
 
@@ -98,7 +98,7 @@ constexpr void maybe::result<T, E>::clear() noexcept
 
 template <typename T, typename E>
 template <typename F>
-constexpr auto maybe::result<T, E>::map(F f) noexcept
+auto maybe::result<T, E>::map(F f) noexcept
     -> maybe::result<typename std::result_of<F(T)>::type, E>
 {
     typedef maybe::result<typename std::result_of<F(T)>::type, E> return_result_t;
@@ -111,7 +111,7 @@ constexpr auto maybe::result<T, E>::map(F f) noexcept
 
 template <typename T, typename E>
 template <typename U>
-constexpr auto maybe::result<T, E>::map_value(U value) noexcept -> maybe::result<U, E>
+auto maybe::result<T, E>::map_value(U value) noexcept -> maybe::result<U, E>
 {
     if (is_err()) {
         return maybe::result<U, E>::err(std::forward<E>(err_value()));
@@ -122,7 +122,7 @@ constexpr auto maybe::result<T, E>::map_value(U value) noexcept -> maybe::result
 
 template <typename T, typename E>
 template <typename F>
-constexpr auto maybe::result<T, E>::map_err(F f) noexcept
+auto maybe::result<T, E>::map_err(F f) noexcept
     -> maybe::result<T, typename std::result_of<F(E)>::type>
 {
     typedef maybe::result<T, typename std::result_of<F(E)>::type> return_result_t;
@@ -135,7 +135,7 @@ constexpr auto maybe::result<T, E>::map_err(F f) noexcept
 
 template <typename T, typename E>
 template <typename U>
-constexpr auto maybe::result<T, E>::map_err_value(U value) noexcept -> maybe::result<T, U>
+auto maybe::result<T, E>::map_err_value(U value) noexcept -> maybe::result<T, U>
 {
     if (is_ok()) {
         return maybe::result<T, U>::ok(std::forward<T>(ok_value()));
@@ -146,7 +146,7 @@ constexpr auto maybe::result<T, E>::map_err_value(U value) noexcept -> maybe::re
 
 template <typename T, typename E>
 template <typename F>
-constexpr auto maybe::result<T, E>::and_then(F f) noexcept -> typename std::result_of<F(T)>::type
+auto maybe::result<T, E>::and_then(F f) noexcept -> typename std::result_of<F(T)>::type
 {
     typedef typename std::result_of<F(T)>::type result_t;
 
@@ -158,7 +158,7 @@ constexpr auto maybe::result<T, E>::and_then(F f) noexcept -> typename std::resu
 
 template <typename T, typename E>
 template <typename R>
-constexpr auto maybe::result<T, E>::into_err() noexcept -> R
+auto maybe::result<T, E>::into_err() noexcept -> R
 {
     if (is_err()) {
         return R::err(std::forward<E>(err_value()));

@@ -58,13 +58,13 @@ namespace maybe {
     template <typename T, typename E>
     class result final {
     private:
-        constexpr void copy_from(const result<T, E>& other) noexcept;
-        constexpr void set_from(result<T, E>& other) noexcept;
-        constexpr void init_ok(T&& value) noexcept;
-        constexpr void init_ok(const T& value) noexcept;
-        constexpr void init_err(E&& value) noexcept;
-        constexpr void init_err(const E& value) noexcept;
-        constexpr void clear() noexcept;
+        void copy_from(const result<T, E>& other) noexcept;
+        void set_from(result<T, E>& other) noexcept;
+        void init_ok(T&& value) noexcept;
+        void init_ok(const T& value) noexcept;
+        void init_err(E&& value) noexcept;
+        void init_err(const E& value) noexcept;
+        void clear() noexcept;
 
         internal::Value tag;
         union {
@@ -349,16 +349,16 @@ namespace maybe {
 
         // Unsafe access.
 
-        constexpr T* ok_dataptr() const noexcept
+        constexpr T* ok_dataptr() noexcept
         {
             assert(is_ok());
-            return std::addressof(ok_val);
+            return const_cast<T*>(std::addressof(ok_val));
         }
 
-        constexpr E* err_dataptr() const noexcept
+        constexpr E* err_dataptr() noexcept
         {
             assert(is_err());
-            return std::addressof(err_val);
+            return const_cast<E*>(std::addressof(err_val));
         }
 
         // Functional helpers.
@@ -374,7 +374,7 @@ namespace maybe {
          * @return maybe::result<U, E>
          */
         template <typename F>
-        constexpr auto map(F f) noexcept -> maybe::result<typename std::result_of<F(T)>::type, E>;
+        auto map(F f) noexcept -> maybe::result<typename std::result_of<F(T)>::type, E>;
 
         /**
          * Maps a result<T, E> to result<U, E> by always returning provided U value on success,
@@ -386,10 +386,11 @@ namespace maybe {
          * @return maybe::result<U, E>
          */
         template <typename U>
-        constexpr auto map_value(U value) noexcept -> maybe::result<U, E>;
+        auto map_value(U value) noexcept -> maybe::result<U, E>;
 
         /**
          * Maps a result<T, E> to result<T, U> (where U is return value of F(E)) by applying a
+         * function to a
          * function to a
          * contained err value, leaving an ok value untouched.
          *
@@ -399,7 +400,7 @@ namespace maybe {
          * @return maybe::result<T, U>
          */
         template <typename F>
-        constexpr auto map_err(F f) noexcept
+        auto map_err(F f) noexcept
             -> maybe::result<T, typename std::result_of<F(E)>::type>;
 
         /**
@@ -412,7 +413,7 @@ namespace maybe {
          * @return maybe::result<T, U>
          */
         template <typename U>
-        constexpr auto map_err_value(U value) noexcept -> maybe::result<T, U>;
+        auto map_err_value(U value) noexcept -> maybe::result<T, U>;
 
         /**
          * Calls op if the result is ok, otherwise returns the err value of self.
@@ -423,10 +424,10 @@ namespace maybe {
          * @return maybe::result<U, E>
          */
         template <typename F>
-        constexpr auto and_then(F op) noexcept -> typename std::result_of<F(T)>::type;
+        auto and_then(F op) noexcept -> typename std::result_of<F(T)>::type;
 
         template <typename R>
-        constexpr auto into_err() noexcept -> R;
+        auto into_err() noexcept -> R;
     };
 
     template <typename T, typename E>
