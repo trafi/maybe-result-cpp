@@ -34,18 +34,6 @@ matrix:
           sources:
             - george-edison55-precise-backports
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.6
-          packages:
-            - clang-3.6
-            - cmake
-            - cmake-data
-      env: CXX_COMPILER=clang++-3.6 C_COMPILER=clang-3.6
-    - compiler: clang
-      addons:
-        apt:
-          sources:
-            - george-edison55-precise-backports
-            - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
@@ -57,6 +45,4 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y libopencv-dev
 script:
-  - mkdir build
-  - cd build
-  - cmake -DCMAKE_CXX_COMPILER=$CXX_COMPILER -DCMAKE_C_COMPILER=$C_COMPILER .. && ./dev/run-tests.sh
+  - ./dev/travis-run-tests.sh
