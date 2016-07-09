@@ -1,8 +1,10 @@
 # Maybe Result
 
+[![Build Status](https://travis-ci.org/trafi/maybe-result-cpp.svg?branch=master)](https://travis-ci.org/trafi/maybe-result-cpp)
+
 Maybe Result is a return value wrapper that can contain either a value
 `T` or error `E`. It borrows ideas heavily from the [C++17's
-`std::experimental::optional`][optional], [Rust's std::result](result) and
+`std::experimental::optional`][optional], [Rust's std::result][result] and
 the [`std::expected`][expected] that was proposed but not yet accepted
 for C++17.
 
@@ -99,15 +101,30 @@ so that the include would be:
 
 A C++ compiler shat supports C++14 is required.
 You can use `-std=c++14` flag for sufficiently recent versions of
-`GCC` or `CLANG`.
+`GCC` (4.9) or `CLANG` (3.7).
 
 __Warning! Library is highly experimental and is not guaranteed to work.__
 
 ## Running tests
 
+Library requires `std::experimental::optional` implementation, location
+of which can be specified with `-DEXPERIMENTAL_OPTIONAL_INCLUDE` flag:
+
 ```bash
-cmake .
+cmake -DEXPERIMENTAL_OPTIONAL_INCLUDE=../path/to/optional .
 make tests && ./tests/tests
+```
+
+There is a script that does this automatically:
+
+```bash
+./dev/run-tests.sh
+```
+
+In addition to this, you can run tests on all supported compilers using docker:
+
+```bash
+./dev/docker-run-tests.sh
 ```
 
 ## License

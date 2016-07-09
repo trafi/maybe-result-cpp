@@ -13,93 +13,8 @@
 #include "result.hpp"
 
 template <typename T, typename E>
-void maybe::result<T, E>::copy_from(const result<T, E>& other) noexcept
-{
-    using ::maybe::internal::Value;
-
-    switch (other.tag) {
-        case Value::OK:
-            init_ok(other.ok_val);
-            break;
-        case Value::ERR:
-            init_err(other.err_val);
-            break;
-        default:
-            tag = Value::NONE;
-            break;
-    }
-}
-
-template <typename T, typename E>
-void maybe::result<T, E>::set_from(result<T, E>& other) noexcept
-{
-    using ::maybe::internal::Value;
-
-    switch (other.tag) {
-        case Value::OK:
-            init_ok(std::move(other.ok_val));
-            break;
-        case Value::ERR:
-            init_err(std::move(other.err_val));
-            break;
-        default:
-            tag = Value::NONE;
-            return;
-    }
-    other.tag = Value::NONE;
-}
-
-template <typename T, typename E>
-void maybe::result<T, E>::init_ok(T&& value) noexcept
-{
-    tag = ::maybe::internal::Value::OK;
-    ::new (static_cast<void*>(ok_dataptr())) T(std::forward<T>(value));
-}
-
-template <typename T, typename E>
-void maybe::result<T, E>::init_ok(const T& value) noexcept
-{
-    tag = ::maybe::internal::Value::OK;
-    ::new (static_cast<void*>(ok_dataptr())) T(value);
-}
-
-template <typename T, typename E>
-void maybe::result<T, E>::init_err(E&& value) noexcept
-{
-    tag = ::maybe::internal::Value::ERR;
-    ::new (static_cast<void*>(err_dataptr())) E(std::forward<E>(value));
-}
-
-template <typename T, typename E>
-void maybe::result<T, E>::init_err(const E& value) noexcept
-{
-    tag = ::maybe::internal::Value::ERR;
-    ::new (static_cast<void*>(err_dataptr())) E(value);
-}
-
-template <typename T, typename E>
-void maybe::result<T, E>::clear() noexcept
-{
-    using ::maybe::internal::Value;
-
-    switch (tag) {
-        case Value::OK:
-            (&this->ok_val)->T::~T();
-            tag = Value::NONE;
-            break;
-        case Value::ERR:
-            (&this->err_val)->E::~E();
-            tag = Value::NONE;
-            break;
-        default:
-            break;
-    }
-}
-
-template <typename T, typename E>
 template <typename F>
-auto maybe::result<T, E>::map(F f) noexcept
-    -> maybe::result<typename std::result_of<F(T)>::type, E>
+inline auto maybe::result<T, E>::map(F f) noexcept -> maybe::result<typename std::result_of<F(T)>::type, E>
 {
     typedef maybe::result<typename std::result_of<F(T)>::type, E> return_result_t;
 
@@ -111,7 +26,7 @@ auto maybe::result<T, E>::map(F f) noexcept
 
 template <typename T, typename E>
 template <typename U>
-auto maybe::result<T, E>::map_value(U value) noexcept -> maybe::result<U, E>
+inline auto maybe::result<T, E>::map_value(U value) noexcept -> maybe::result<U, E>
 {
     if (is_err()) {
         return maybe::result<U, E>::err(std::forward<E>(err_value()));
@@ -122,7 +37,7 @@ auto maybe::result<T, E>::map_value(U value) noexcept -> maybe::result<U, E>
 
 template <typename T, typename E>
 template <typename F>
-auto maybe::result<T, E>::map_err(F f) noexcept
+inline auto maybe::result<T, E>::map_err(F f) noexcept
     -> maybe::result<T, typename std::result_of<F(E)>::type>
 {
     typedef maybe::result<T, typename std::result_of<F(E)>::type> return_result_t;
@@ -135,7 +50,7 @@ auto maybe::result<T, E>::map_err(F f) noexcept
 
 template <typename T, typename E>
 template <typename U>
-auto maybe::result<T, E>::map_err_value(U value) noexcept -> maybe::result<T, U>
+inline auto maybe::result<T, E>::map_err_value(U value) noexcept -> maybe::result<T, U>
 {
     if (is_ok()) {
         return maybe::result<T, U>::ok(std::forward<T>(ok_value()));
@@ -146,7 +61,7 @@ auto maybe::result<T, E>::map_err_value(U value) noexcept -> maybe::result<T, U>
 
 template <typename T, typename E>
 template <typename F>
-auto maybe::result<T, E>::and_then(F f) noexcept -> typename std::result_of<F(T)>::type
+inline auto maybe::result<T, E>::and_then(F f) noexcept -> typename std::result_of<F(T)>::type
 {
     typedef typename std::result_of<F(T)>::type result_t;
 
@@ -158,7 +73,7 @@ auto maybe::result<T, E>::and_then(F f) noexcept -> typename std::result_of<F(T)
 
 template <typename T, typename E>
 template <typename R>
-auto maybe::result<T, E>::into_err() noexcept -> R
+inline auto maybe::result<T, E>::into_err() noexcept -> R
 {
     if (is_err()) {
         return R::err(std::forward<E>(err_value()));

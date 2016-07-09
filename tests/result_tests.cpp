@@ -12,7 +12,11 @@ public:
         destructor_fun = std::move(other.destructor_fun);
         other.destructor_fun = nullptr;
     }
-    NoCopy& operator=(NoCopy&& other) = default;
+    NoCopy& operator=(NoCopy&& other) {
+        std::swap(flag, other.flag);
+        std::swap(destructor_fun, other.destructor_fun);
+        return *this;
+    }
 
     NoCopy(int flag, std::function<void()> destructor_fun)
         : flag(flag), destructor_fun(destructor_fun)
@@ -45,11 +49,11 @@ TEST_CASE("result")
         REQUIRE(res);
         REQUIRE(12 == res.ok_value());
 
-//        auto other_ok = result<int, int>::ok(12);
-//        REQUIRE(res == other_ok);
-//
-//        auto other_different_ok = result<int, int>::ok(42);
-//        REQUIRE(res != other_different_ok);
+        auto other_ok = result<int, int>::ok(12);
+        REQUIRE(res == other_ok);
+
+        auto other_different_ok = result<int, int>::ok(42);
+        REQUIRE(res != other_different_ok);
     }
 
     SECTION("created err result returns err value")
@@ -60,18 +64,18 @@ TEST_CASE("result")
         REQUIRE(!res);
         REQUIRE(12 == res.err_value());
 
-//        auto other_err = result<int, int>::err(12);
-//        REQUIRE(res == other_err);
-//
-//        auto other_different_err = result<int, int>::err(42);
-//        REQUIRE(res != other_different_err);
+        auto other_err = result<int, int>::err(12);
+        REQUIRE(res == other_err);
+
+        auto other_different_err = result<int, int>::err(42);
+        REQUIRE(res != other_different_err);
     }
 
     SECTION("created ok not equal created result")
     {
         auto ok = result<int, int>::ok(12);
         auto err = result<int, int>::err(12);
-//        REQUIRE(ok != err);
+        REQUIRE(ok != err);
     }
 
     SECTION("throws exception if invalid value accessed")
@@ -192,7 +196,7 @@ TEST_CASE("result")
         REQUIRE(ss.str() == "[err]");
     }
 
-#if MAYBE_RESULT_HAS_MOVE_ACCESSORS == 1
+#if OPTIONAL_HAS_MOVE_ACCESSORS == 1
 
     SECTION("ok move accessor works")
     {
