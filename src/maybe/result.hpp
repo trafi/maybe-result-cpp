@@ -12,8 +12,8 @@
 
 #include "result.fwd.hpp"
 
-#include <string>
 #include <optional.hpp>
+#include <string>
 
 namespace maybe {
     namespace internal {
@@ -43,18 +43,44 @@ namespace maybe {
         {
         }
 
-        /** helper constructor for ok value */
+        result(const T& value, internal::placeholder) : var_ok(value)
+        {
+        }
+
+        result(internal::placeholder, const E& value) : var_err(value)
+        {
+        }
+
         constexpr static result<T, E> ok(T&& value) noexcept
         {
             return std::forward<result<T, E>>(
                 result<T, E>(std::forward<T>(value), internal::placeholder{}));
         }
 
-        /** helper constructor for ok value */
+        constexpr static result<T, E> ok(const T& value) noexcept
+        {
+            return std::forward<result<T, E>>(result<T, E>(value, internal::placeholder{}));
+        }
+
         constexpr static result<T, E> err(E&& value) noexcept
         {
             return std::forward<result<T, E>>(
                 result<T, E>(internal::placeholder{}, std::forward<E>(value)));
+        }
+
+        constexpr static result<T, E> err(const E& value) noexcept
+        {
+            return std::forward<result<T, E>>(result<T, E>(internal::placeholder{}, value));
+        }
+
+        constexpr static result<T, E> default_ok() noexcept
+        {
+            return std::experimental::constexpr_move(result<T, E>(T(), internal::placeholder{}));
+        }
+
+        constexpr static result<T, E> default_err() noexcept
+        {
+            return std::experimental::constexpr_move(result<T, E>(internal::placeholder{}, E()));
         }
 
         // Inspection.
