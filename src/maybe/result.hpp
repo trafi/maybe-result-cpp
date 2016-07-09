@@ -12,19 +12,13 @@
 
 #include "result.fwd.hpp"
 
-#include <optional.hpp>
 #include <string>
+#include <optional.hpp>
 
 namespace maybe {
     namespace internal {
         struct placeholder {
         };
-    }
-
-    template <class T>
-    inline constexpr typename std::remove_reference<T>::type&& mr_constexpr_move(T&& t) noexcept
-    {
-        return static_cast<typename std::remove_reference<T>::type&&>(t);
     }
 
     template <typename T, typename E>
