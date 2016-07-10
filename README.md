@@ -1,8 +1,6 @@
 # Maybe Result
 
-<div style="width: 100%; height: 32px;">
-    <img src="https://travis-ci.org/trafi/maybe-result-cpp.svg?branch=master" alt="Status" style="float:left" />
-</div>
+[![Build Status](https://travis-ci.org/trafi/maybe-result-cpp.svg?branch=master)](https://travis-ci.org/trafi/maybe-result-cpp)
 
 Maybe Result is a return value wrapper that can contain either a value
 `T` or error `E`. It borrows ideas heavily from the [C++17's
