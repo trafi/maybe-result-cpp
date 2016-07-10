@@ -10,11 +10,13 @@ matrix:
           sources:
             - george-edison55-precise-backports
             - ubuntu-toolchain-r-test
+            - kedazo-doxygen-updates-precise
           packages:
             - g++-4.9
             - gcc-4.9
             - cmake
             - cmake-data
+            - doxygen
       env: CXX_COMPILER=g++-4.9 C_COMPILER=gcc-4.9 DOC=true
     - compiler: gcc
       addons:

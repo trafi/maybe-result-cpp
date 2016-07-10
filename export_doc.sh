@@ -13,7 +13,6 @@ fi
 echo "exporting docs"
 
 export PATH=$HOME/.local/bin:$PATH
-sudo apt-get install doxygen
 doxygen
 pip install ghp-import --user `whoami`
 ghp-import -n html
