@@ -13,6 +13,9 @@ fi
 echo "exporting docs"
 
 export PATH=$HOME/.local/bin:$PATH
+sudo apt-add-repository -y ppa:kedazo/doxygen-updates-precise
+sudo apt-get update
+sudo apt-get install -y doxygen
 doxygen
 pip install ghp-import --user `whoami`
 ghp-import -n html
