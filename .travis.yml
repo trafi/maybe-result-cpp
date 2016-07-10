@@ -15,7 +15,7 @@ matrix:
             - gcc-4.9
             - cmake
             - cmake-data
-      env: CXX_COMPILER=g++-4.9 C_COMPILER=gcc-4.9
+      env: CXX_COMPILER=g++-4.9 C_COMPILER=gcc-4.9 DOC=true
     - compiler: gcc
       addons:
         apt:
@@ -46,3 +46,5 @@ before_install:
   - sudo apt-get install -y libopencv-dev
 script:
   - ./dev/travis-run-tests.sh
+after_success:
+  - /bin/bash export_doc.sh

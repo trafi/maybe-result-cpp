@@ -51,6 +51,12 @@ namespace maybe {
         {
         }
 
+        /**
+         * Create a new ok value.
+         *
+         * @param T value
+         * @return result<T, E>
+         */
         constexpr static result<T, E> ok(T&& value) noexcept
         {
             return std::forward<result<T, E>>(
@@ -62,6 +68,12 @@ namespace maybe {
             return std::forward<result<T, E>>(result<T, E>(value, internal::placeholder{}));
         }
 
+        /**
+         * Create a new err value.
+         *
+         * @param E value
+         * @return result<T, E>
+         */
         constexpr static result<T, E> err(E&& value) noexcept
         {
             return std::forward<result<T, E>>(
@@ -73,11 +85,21 @@ namespace maybe {
             return std::forward<result<T, E>>(result<T, E>(internal::placeholder{}, value));
         }
 
+        /**
+         * Create a new ok value using `T()` constructor.
+         *
+         * @return result<T, E>
+         */
         constexpr static result<T, E> default_ok() noexcept
         {
             return std::experimental::constexpr_move(result<T, E>(T(), internal::placeholder{}));
         }
 
+        /**
+         * Create a new err value using `E()` constructor.
+         *
+         * @return result<T, E>
+         */
         constexpr static result<T, E> default_err() noexcept
         {
             return std::experimental::constexpr_move(result<T, E>(internal::placeholder{}, E()));
@@ -85,11 +107,21 @@ namespace maybe {
 
         // Inspection.
 
+        /**
+         * Check if result contains ok value.
+         *
+         * @return bool
+         */
         inline bool is_ok() const noexcept
         {
             return !!var_ok;
         }
 
+        /**
+         * Check if result contains err value.
+         *
+         * @return bool
+         */
         inline bool is_err() const noexcept
         {
             return !!var_err;
@@ -119,6 +151,11 @@ namespace maybe {
 
 #else
 
+        /**
+         * Retrieve ok value or throw `bad_optional_access` exception.
+         *
+         * @return T
+         */
         T const& ok_value() const
         {
             return var_ok.value();
@@ -145,6 +182,19 @@ namespace maybe {
             return var_err.value_or(std::forward<V>(v));
         }
 
+#else
+
+        /**
+         * Retrieve ok value or the provided default `V` which can be casted to `T`.
+         *
+         * @return T
+         */
+        template <class V>
+        T ok_value_or(V&& v) const
+        {
+            return var_ok.value_or(std::forward<V>(v));
+        }
+
 #endif
 
 #if OPTIONAL_HAS_MOVE_ACCESSORS == 1
@@ -166,6 +216,11 @@ namespace maybe {
 
 #else
 
+        /**
+         * Retrieve err value or throw `bad_optional_access` exception.
+         *
+         * @return E
+         */
         E const& err_value() const
         {
             return var_err.value();
@@ -188,6 +243,19 @@ namespace maybe {
 
         template <class V>
         OPTIONAL_MUTABLE_CONSTEXPR E err_value_or(V&& v) &&
+        {
+            return var_err.value_or(std::forward<V>(v));
+        }
+
+#else
+
+        /**
+         * Retrieve err value or the provided default `V` which can be casted to `E`.
+         *
+         * @return E
+         */
+        template <class V>
+        E err_value_or(V&& v) const
         {
             return var_err.value_or(std::forward<V>(v));
         }
@@ -258,6 +326,13 @@ namespace maybe {
         template <typename F>
         inline auto and_then(F op) noexcept -> typename std::result_of<F(T)>::type;
 
+        /**
+         * Converts into another result with different ok type `R` and forwards the same error.
+         *
+         * The ok type `R` must have `R()` constructor in case the result does not contain an err.
+         *
+         * @return maybe::result<R, E>
+         */
         template <typename R>
         inline auto into_err() noexcept -> R;
     };
