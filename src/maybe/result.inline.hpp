@@ -21,7 +21,7 @@ inline auto maybe::result<T, E>::map(F f) noexcept -> maybe::result<typename std
     if (is_err()) {
         return return_result_t::err(std::forward<E>(err_value()));
     }
-    return return_result_t::ok(f(std::forward<T>(ok_value())));
+    return return_result_t::ok(f(ok_value()));
 };
 
 template <typename T, typename E>
@@ -45,7 +45,7 @@ inline auto maybe::result<T, E>::map_err(F f) noexcept
     if (is_ok()) {
         return return_result_t::ok(std::forward<T>(ok_value()));
     }
-    return return_result_t::err(f(std::forward<E>(err_value())));
+    return return_result_t::err(f(err_value()));
 };
 
 template <typename T, typename E>
@@ -68,7 +68,7 @@ inline auto maybe::result<T, E>::and_then(F f) noexcept -> typename std::result_
     if (is_err()) {
         return maybe::result<typename result_t::ok_type, E>::err(std::forward<E>(err_value()));
     }
-    return f(std::forward<T>(ok_value()));
+    return f(ok_value());
 };
 
 template <typename T, typename E>
