@@ -20,7 +20,7 @@ inline auto maybe::result<T, E>::map(F f) noexcept -> maybe::result<R, E>
         return maybe::result<R, E>::err(std::forward<E>(err_value()));
     }
 
-    return maybe::result<R, E>::ok(f(ok_value()));
+    return maybe::result<R, E>(f(ok_value()), internal::placeholder{});
 };
 
 template <typename T, typename E>
@@ -30,7 +30,7 @@ inline auto maybe::result<T, E>::map_void() noexcept -> maybe::result<void, E>
         return maybe::result<void, E>::err(std::forward<E>(err_value()));
     }
 
-    return maybe::result<void, E>::ok();
+    return maybe::result<void, E>();
 };
 
 template <typename T, typename E>
@@ -41,7 +41,7 @@ inline auto maybe::result<T, E>::map_value(U value) noexcept -> maybe::result<U,
         return maybe::result<U, E>::err(std::forward<E>(err_value()));
     }
 
-    return maybe::result<U, E>::ok(std::forward<U>(value));
+    return maybe::result<U, E>(std::forward<U>(value), internal::placeholder{});
 };
 
 template <typename T, typename E>
@@ -52,9 +52,9 @@ inline auto maybe::result<T, E>::map_err(F f) noexcept
     typedef maybe::result<T, typename std::result_of<F(E)>::type> return_result_t;
 
     if (is_ok()) {
-        return return_result_t::ok(std::forward<T>(ok_value()));
+        return return_result_t(std::forward<T>(ok_value()), internal::placeholder{});
     }
-    return return_result_t::err(f(err_value()));
+    return return_result_t(internal::placeholder{}, f(err_value()));
 };
 
 template <typename T, typename E>
@@ -62,7 +62,7 @@ template <typename U>
 inline auto maybe::result<T, E>::map_err_value(U value) noexcept -> maybe::result<T, U>
 {
     if (is_ok()) {
-        return maybe::result<T, U>::ok(std::forward<T>(ok_value()));
+        return maybe::result<T, U>(std::forward<T>(ok_value()), internal::placeholder{});
     }
 
     return maybe::result<T, U>::err(std::forward<U>(value));
@@ -81,13 +81,13 @@ inline auto maybe::result<T, E>::and_then(F f) noexcept -> typename std::result_
 };
 
 template <typename T, typename E>
-template <typename R>
-inline auto maybe::result<T, E>::into_err() noexcept -> R
+template <typename U>
+inline auto maybe::result<T, E>::into_err() noexcept -> maybe::result<U, E> const
 {
     if (is_err()) {
-        return R::err(std::forward<E>(err_value()));
+        return maybe::result<U, E>(internal::placeholder{}, std::forward<E>(err_value()));
     }
-    return R::default_ok();
+    return maybe::result<U, E>::default_ok();
 };
 
 template <typename E>
@@ -100,7 +100,7 @@ inline auto maybe::result<void, E>::map(F f) noexcept
     if (is_err()) {
         return return_result_t::err(std::forward<E>(err_value()));
     }
-    return return_result_t::ok(f());
+    return return_result_t(f(), internal::placeholder{});
 };
 
 template <typename E>
@@ -111,7 +111,7 @@ inline auto maybe::result<void, E>::map_value(U value) noexcept -> maybe::result
         return maybe::result<U, E>::err(std::forward<E>(err_value()));
     }
 
-    return maybe::result<U, E>::ok(std::forward<U>(value));
+    return maybe::result<U, E>(std::forward<U>(value), internal::placeholder{});
 };
 
 template <typename E>
@@ -124,7 +124,7 @@ inline auto maybe::result<void, E>::map_err(F f) noexcept
     if (is_ok()) {
         return return_result_t::ok();
     }
-    return return_result_t::err(f(err_value()));
+    return return_result_t(internal::placeholder{}, f(err_value()));
 };
 
 template <typename E>
@@ -135,7 +135,7 @@ inline auto maybe::result<void, E>::map_err_value(U value) noexcept -> maybe::re
         return maybe::result<void, U>::ok();
     }
 
-    return maybe::result<void, U>::err(std::forward<U>(value));
+    return maybe::result<void, U>(std::forward<U>(value));
 };
 
 template <typename E>
@@ -151,11 +151,10 @@ inline auto maybe::result<void, E>::and_then(F f) noexcept -> typename std::resu
 };
 
 template <typename E>
-template <typename R>
-inline auto maybe::result<void, E>::into_err() noexcept -> R
+inline auto maybe::result<void, E>::into_err() noexcept -> maybe::result<void, E>
 {
     if (is_err()) {
-        return R::err(std::forward<E>(err_value()));
+        return maybe::result<void, E>(std::forward<E>(err_value()));
     }
-    return R::default_ok();
+    return maybe::result<void, E>::default_ok();
 };

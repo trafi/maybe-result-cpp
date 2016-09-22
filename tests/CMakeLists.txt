@@ -8,6 +8,7 @@ add_executable(${TARGET}
         result_tests.cpp
         result_map_tests.cpp
         result_map_err_tests.cpp
+        result_into_err_tests.cpp
         result_and_then_tests.cpp
         example_test.cpp)
 
