@@ -28,7 +28,7 @@ TEST_CASE("result_into_err")
     SECTION("converts result<A, E>::err to result<void, E>::err")
     {
         auto a = result<A, int>::err(42);
-        auto b = a.into_err<result<void, int>>();
+        auto b = a.into_err<void>();
         REQUIRE(!b);
         REQUIRE(42 == b.err_value());
     }
