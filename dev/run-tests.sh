@@ -7,7 +7,7 @@ mkdir -p /tmp/build
 cd /tmp/build
 if [ ! -d "optional" ]; then
     mkdir -p optional
-    curl -Ls https://api.github.com/repos/akrzemi1/Optional/tarball | tar --strip-components=1 -xz -C optional
+    tar --strip-components=1 -xzf /opt/dev/optional.tar.gz -C optional
 fi
 cmake -DEXPERIMENTAL_OPTIONAL_INCLUDE=/tmp/build/optional ${SRC}
 
