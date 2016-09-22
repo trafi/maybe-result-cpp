@@ -146,7 +146,7 @@ namespace maybe {
 
         OPTIONAL_MUTABLE_CONSTEXPR T&& ok_value() &&
         {
-            return std::move(var_ok.value());
+            return var_ok.value();
         }
 
 #else
@@ -156,7 +156,7 @@ namespace maybe {
          *
          * @return T
          */
-        T const& ok_value() const
+        constexpr T const& ok_value() const
         {
             return var_ok.value();
         }
@@ -173,14 +173,26 @@ namespace maybe {
         template <class V>
         constexpr T ok_value_or(V&& v) const&
         {
-            return var_ok.value_or(std::forward<V>(v));
+            return var_ok.value_or(std::experimental::constexpr_forward<V>(v));
         }
+
+#if OPTIONAL_HAS_MOVE_ACCESSORS == 1
 
         template <class V>
         OPTIONAL_MUTABLE_CONSTEXPR T ok_value_or(V&& v) &&
         {
-            return var_err.value_or(std::forward<V>(v));
+            return var_ok.value_or(std::experimental::constexpr_forward<V>(v));
         }
+
+#else
+
+        template <class V>
+        T ok_value_or(V&& v) &&
+        {
+            return var_ok.value_or(std::experimental::constexpr_forward<V>(v));
+        }
+
+#endif
 
 #else
 
@@ -190,7 +202,7 @@ namespace maybe {
          * @return T
          */
         template <class V>
-        T ok_value_or(V&& v) const
+        constexpr T ok_value_or(V&& v) const
         {
             return var_ok.value_or(std::forward<V>(v));
         }
@@ -211,7 +223,7 @@ namespace maybe {
 
         OPTIONAL_MUTABLE_CONSTEXPR E&& err_value() &&
         {
-            return std::move(var_err.value());
+            return var_err.value();
         }
 
 #else
@@ -221,7 +233,7 @@ namespace maybe {
          *
          * @return E
          */
-        E const& err_value() const
+        constexpr E const& err_value() const
         {
             return var_err.value();
         }
@@ -238,14 +250,26 @@ namespace maybe {
         template <class V>
         constexpr E err_value_or(V&& v) const&
         {
-            return var_err.value_or(std::forward<V>(v));
+            return var_err.value_or(std::experimental::constexpr_forward<V>(v));
         }
+
+#if OPTIONAL_HAS_MOVE_ACCESSORS == 1
 
         template <class V>
         OPTIONAL_MUTABLE_CONSTEXPR E err_value_or(V&& v) &&
         {
-            return var_err.value_or(std::forward<V>(v));
+            return var_err.value_or(std::experimental::constexpr_forward<V>(v));
         }
+
+#else
+
+        template <class V>
+        E err_value_or(V&& v) &&
+        {
+            return var_err.value_or(std::experimental::constexpr_forward<V>(v));
+        }
+
+#endif
 
 #else
 
@@ -334,14 +358,14 @@ namespace maybe {
         inline auto and_then(F op) noexcept -> typename std::result_of<F(T)>::type;
 
         /**
-         * Converts into another result with different ok type `R` and forwards the same error.
+         * Converts into another result with different ok type `U` and forwards the same error.
          *
-         * The ok type `R` must have `R()` constructor in case the result does not contain an err.
+         * The ok type `U` must have `U()` constructor in case the result does not contain an err.
          *
-         * @return maybe::result<R, E>
+         * @return maybe::result<U, E>
          */
-        template <typename R>
-        inline auto into_err() noexcept -> R;
+        template <typename U>
+        inline auto into_err() noexcept -> maybe::result<U, E> const;
     };
 
     template <typename T, typename E>
@@ -368,6 +392,14 @@ namespace maybe {
         typedef E err_type;
 
         result()
+        {
+        }
+
+        result(internal::placeholder, E&& value) : var_err(std::forward<E>(value))
+        {
+        }
+
+        result(internal::placeholder, const E& value) : var_err(value)
         {
         }
 
@@ -591,14 +623,11 @@ namespace maybe {
         inline auto and_then(F op) noexcept -> typename std::result_of<F()>::type;
 
         /**
-         * Converts into another result with different ok type `R` and forwards the same error.
+         * Converts into another result with ok type void and forwards the same error.
          *
-         * The ok type `R` must have `R()` constructor in case the result does not contain an err.
-         *
-         * @return maybe::result<R, E>
+         * @return maybe::result<void, E>
          */
-        template <typename R>
-        inline auto into_err() noexcept -> R;
+        inline auto into_err() noexcept -> maybe::result<void, E>;
     };
 
     template <typename E>
