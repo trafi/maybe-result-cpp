@@ -71,6 +71,21 @@ TEST_CASE("result")
         REQUIRE(res != other_different_err);
     }
 
+    SECTION("created err result returns err value in result<void, E>")
+    {
+        auto res = result<void, int>::err(12);
+        REQUIRE(res.is_err());
+        REQUIRE(!res.is_ok());
+        REQUIRE(!res);
+        REQUIRE(12 == res.err_value());
+
+        auto other_err = result<void, int>::err(12);
+        REQUIRE(res == other_err);
+
+        auto other_different_err = result<void, int>::err(42);
+        REQUIRE(res != other_different_err);
+    }
+
     SECTION("created ok not equal created result")
     {
         auto ok = result<int, int>::ok(12);
@@ -78,10 +93,25 @@ TEST_CASE("result")
         REQUIRE(ok != err);
     }
 
+    SECTION("created ok not equal created result in result<void, E>")
+    {
+        auto ok = result<void, int>::ok();
+        auto err = result<void, int>::err(12);
+        REQUIRE(ok != err);
+    }
+
     SECTION("throws exception if invalid value accessed")
     {
         auto ok = result<int, int>::ok(12);
         auto err = result<int, int>::err(12);
+        REQUIRE_THROWS(ok.err_value());
+        REQUIRE_THROWS(err.ok_value());
+    }
+
+    SECTION("throws exception if invalid value accessed in result<void, E>")
+    {
+        auto ok = result<void, int>::ok();
+        auto err = result<void, int>::err(12);
         REQUIRE_THROWS(ok.err_value());
         REQUIRE_THROWS(err.ok_value());
     }
@@ -94,6 +124,14 @@ TEST_CASE("result")
         REQUIRE(err.err_value_or(42) == 12);
         REQUIRE(ok.err_value_or(42) == 42);
         REQUIRE(err.ok_value_or(42) == 42);
+    }
+
+    SECTION("returns default values in result<void, E>")
+    {
+        auto ok = result<void, int>::ok();
+        auto err = result<void, int>::err(12);
+        REQUIRE(err.err_value_or(42) == 12);
+        REQUIRE(ok.err_value_or(42) == 42);
     }
 
     SECTION("destroys ok value correctly")

@@ -11,5 +11,9 @@
 #pragma once
 
 namespace maybe {
-    template <typename T, typename E> class result;
+    template <typename T, typename E>
+    class result;
+
+    template <typename E>
+    class result<void, E>;
 }
