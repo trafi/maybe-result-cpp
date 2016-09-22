@@ -371,15 +371,11 @@ namespace maybe {
         {
         }
 
-        result(internal::placeholder)
+        result(E&& value) : var_err(std::forward<E>(value))
         {
         }
 
-        result(internal::placeholder, E&& value) : var_err(std::forward<E>(value))
-        {
-        }
-
-        result(internal::placeholder, const E& value) : var_err(value)
+        result(const E& value) : var_err(value)
         {
         }
 
@@ -391,7 +387,7 @@ namespace maybe {
          */
         constexpr static result<void, E> ok() noexcept
         {
-            return std::forward<result<void, E>>(result<void, E>(internal::placeholder{}));
+            return std::forward<result<void, E>>(result<void, E>());
         }
 
         /**
@@ -402,13 +398,12 @@ namespace maybe {
          */
         constexpr static result<void, E> err(E&& value) noexcept
         {
-            return std::forward<result<void, E>>(
-                result<void, E>(internal::placeholder{}, std::forward<E>(value)));
+            return std::forward<result<void, E>>(result<void, E>(std::forward<E>(value)));
         }
 
         constexpr static result<void, E> err(const E& value) noexcept
         {
-            return std::forward<result<void, E>>(result<void, E>(internal::placeholder{}, value));
+            return std::forward<result<void, E>>(result<void, E>(value));
         }
 
         /**
@@ -418,8 +413,7 @@ namespace maybe {
          */
         constexpr static result<void, E> default_ok() noexcept
         {
-            return std::experimental::constexpr_move(
-                result<void, E>(internal::placeholder{}));
+            return std::experimental::constexpr_move(result<void, E>());
         }
 
         /**
@@ -429,7 +423,7 @@ namespace maybe {
          */
         constexpr static result<void, E> default_err() noexcept
         {
-            return std::experimental::constexpr_move(result<void, E>(internal::placeholder{}, E()));
+            return std::experimental::constexpr_move(result<void, E>(E()));
         }
 
         // Inspection.
