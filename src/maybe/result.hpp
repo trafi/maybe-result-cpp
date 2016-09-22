@@ -419,7 +419,7 @@ namespace maybe {
         constexpr static result<void, E> default_ok() noexcept
         {
             return std::experimental::constexpr_move(
-                result<void, E>(void(), internal::placeholder{}));
+                result<void, E>(internal::placeholder{}));
         }
 
         /**
