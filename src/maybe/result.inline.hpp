@@ -151,10 +151,11 @@ inline auto maybe::result<void, E>::and_then(F f) noexcept -> typename std::resu
 };
 
 template <typename E>
-inline auto maybe::result<void, E>::into_err() noexcept -> maybe::result<void, E>
+template <typename U>
+inline auto maybe::result<void, E>::into_err() noexcept -> maybe::result<U, E>
 {
     if (is_err()) {
-        return maybe::result<void, E>(std::forward<E>(err_value()));
+        return maybe::result<U, E>::err(std::forward<E>(err_value()));
     }
-    return maybe::result<void, E>::default_ok();
+    return maybe::result<U, E>::default_ok();
 };

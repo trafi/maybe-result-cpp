@@ -20,7 +20,7 @@ TEST_CASE("result_into_err")
     SECTION("converts result<A, E>::err to result<B, E>::err")
     {
         auto a = result<A, int>::err(42);
-        auto b = a.into_err<result<B, int>>();
+        auto b = a.into_err<B>();
         REQUIRE(!b);
         REQUIRE(42 == b.err_value());
     }
@@ -29,6 +29,22 @@ TEST_CASE("result_into_err")
     {
         auto a = result<A, int>::err(42);
         auto b = a.into_err<void>();
+        REQUIRE(!b);
+        REQUIRE(42 == b.err_value());
+    }
+
+    SECTION("converts result<void, E>::err to result<void, E>::err")
+    {
+        auto a = result<void, int>::err(42);
+        auto b = a.into_err<void>();
+        REQUIRE(!b);
+        REQUIRE(42 == b.err_value());
+    }
+
+    SECTION("converts result<void, E>::err to result<B, E>::err")
+    {
+        auto a = result<void, int>::err(42);
+        auto b = a.into_err<B>();
         REQUIRE(!b);
         REQUIRE(42 == b.err_value());
     }

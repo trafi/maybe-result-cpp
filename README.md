@@ -34,10 +34,9 @@ so that the include would be:
 ```
 
 A C++ compiler shat supports C++14 is required.
+In addition to that, the library requires move accessors.
 You can use `-std=c++14` flag for sufficiently recent versions of
-`GCC` (4.9) or `CLANG` (3.7).
-
-__Warning! Library is highly experimental and is not guaranteed to work.__
+`GCC` (5.2) or `CLANG` (3.7).
 
 ## Running tests
 

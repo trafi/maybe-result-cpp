@@ -132,8 +132,6 @@ namespace maybe {
             return is_ok();
         }
 
-#if OPTIONAL_HAS_MOVE_ACCESSORS == 1
-
         constexpr T const& ok_value() const&
         {
             return var_ok.value();
@@ -149,25 +147,6 @@ namespace maybe {
             return std::move(var_ok.value());
         }
 
-#else
-
-        /**
-         * Retrieve ok value or throw `bad_optional_access` exception.
-         *
-         * @return T
-         */
-        constexpr T const& ok_value() const
-        {
-            return var_ok.value();
-        }
-
-        T& ok_value()
-        {
-            return var_ok.value();
-        }
-
-#endif
-
 #if OPTIONAL_HAS_THIS_RVALUE_REFS == 1
 
         template <class V>
@@ -176,23 +155,11 @@ namespace maybe {
             return var_ok.value_or(std::experimental::constexpr_forward<V>(v));
         }
 
-#if OPTIONAL_HAS_MOVE_ACCESSORS == 1
-
         template <class V>
         OPTIONAL_MUTABLE_CONSTEXPR T ok_value_or(V&& v) &&
         {
             return var_ok.value_or(std::experimental::constexpr_forward<V>(v));
         }
-
-#else
-
-        template <class V>
-        T ok_value_or(V&& v) &&
-        {
-            return var_ok.value_or(std::experimental::constexpr_forward<V>(v));
-        }
-
-#endif
 
 #else
 
@@ -209,8 +176,6 @@ namespace maybe {
 
 #endif
 
-#if OPTIONAL_HAS_MOVE_ACCESSORS == 1
-
         constexpr E const& err_value() const&
         {
             return var_err.value();
@@ -226,25 +191,6 @@ namespace maybe {
             return std::move(var_err.value());
         }
 
-#else
-
-        /**
-         * Retrieve err value or throw `bad_optional_access` exception.
-         *
-         * @return E
-         */
-        constexpr E const& err_value() const
-        {
-            return var_err.value();
-        }
-
-        E& err_value()
-        {
-            return var_err.value();
-        }
-
-#endif
-
 #if OPTIONAL_HAS_THIS_RVALUE_REFS == 1
 
         template <class V>
@@ -253,23 +199,11 @@ namespace maybe {
             return var_err.value_or(std::experimental::constexpr_forward<V>(v));
         }
 
-#if OPTIONAL_HAS_MOVE_ACCESSORS == 1
-
         template <class V>
         OPTIONAL_MUTABLE_CONSTEXPR E err_value_or(V&& v) &&
         {
             return var_err.value_or(std::experimental::constexpr_forward<V>(v));
         }
-
-#else
-
-        template <class V>
-        E err_value_or(V&& v) &&
-        {
-            return var_err.value_or(std::experimental::constexpr_forward<V>(v));
-        }
-
-#endif
 
 #else
 
@@ -492,8 +426,6 @@ namespace maybe {
             }
         }
 
-#if OPTIONAL_HAS_MOVE_ACCESSORS == 1
-
         constexpr E const& err_value() const&
         {
             return var_err.value();
@@ -508,25 +440,6 @@ namespace maybe {
         {
             return std::move(var_err.value());
         }
-
-#else
-
-        /**
-         * Retrieve err value or throw `bad_optional_access` exception.
-         *
-         * @return E
-         */
-        E const& err_value() const
-        {
-            return var_err.value();
-        }
-
-        E& err_value()
-        {
-            return var_err.value();
-        }
-
-#endif
 
 #if OPTIONAL_HAS_THIS_RVALUE_REFS == 1
 
@@ -627,7 +540,8 @@ namespace maybe {
          *
          * @return maybe::result<void, E>
          */
-        inline auto into_err() noexcept -> maybe::result<void, E>;
+        template <typename U>
+        inline auto into_err() noexcept -> maybe::result<U, E>;
     };
 
     template <typename E>
