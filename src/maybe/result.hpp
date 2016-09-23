@@ -146,7 +146,7 @@ namespace maybe {
 
         OPTIONAL_MUTABLE_CONSTEXPR T&& ok_value() &&
         {
-            return var_ok.value();
+            return std::move(var_ok.value());
         }
 
 #else
@@ -223,7 +223,7 @@ namespace maybe {
 
         OPTIONAL_MUTABLE_CONSTEXPR E&& err_value() &&
         {
-            return var_err.value();
+            return std::move(var_err.value());
         }
 
 #else
