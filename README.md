@@ -35,17 +35,14 @@ so that the include would be:
 
 A C++ compiler shat supports C++14 is required.
 You can use `-std=c++14` flag for sufficiently recent versions of
-`GCC` (4.9) or `CLANG` (3.7).
+`GCC` (5.2) or `CLANG` (3.7).
 
 __Warning! Library is highly experimental and is not guaranteed to work.__
 
 ## Running tests
 
-Library requires `std::experimental::optional` implementation, location
-of which can be specified with `-DEXPERIMENTAL_OPTIONAL_INCLUDE` flag:
-
 ```
-cmake -DEXPERIMENTAL_OPTIONAL_INCLUDE=../path/to/optional .
+cmake .
 make tests && ./tests/tests
 ```
 

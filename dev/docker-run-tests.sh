@@ -2,7 +2,7 @@
 
 COMMAND="./dev/run-tests.sh"
 
-compilers=( "clang-3.7" "clang-3.8" "gcc-4.9" "gcc-5.2" "gcc-6.1" )
+compilers=( "clang-3.7" "clang-3.8" "gcc-5.2" "gcc-6.1" )
 
 for compiler in "${compilers[@]}"
 do

@@ -12,7 +12,7 @@
 
 #include "result.fwd.hpp"
 
-#include <optional.hpp>
+#include <experimental/optional>
 #include <string>
 
 namespace maybe {
@@ -20,6 +20,17 @@ namespace maybe {
         struct placeholder {
         };
     }
+
+    class bad_result_access : public std::logic_error
+    {
+    public:
+        // XXX Should not be inline
+        explicit bad_result_access(const std::string& __arg) : std::logic_error(__arg) { }
+
+        explicit bad_result_access(const char* __arg) : std::logic_error(__arg) { }
+
+        virtual ~bad_result_access() noexcept = default;
+    };
 
     template <typename T, typename E>
     class result final {
@@ -92,7 +103,7 @@ namespace maybe {
          */
         constexpr static result<T, E> default_ok() noexcept
         {
-            return std::experimental::constexpr_move(result<T, E>(T(), internal::placeholder{}));
+            return std::move(result<T, E>(T(), internal::placeholder{}));
         }
 
         /**
@@ -102,7 +113,7 @@ namespace maybe {
          */
         constexpr static result<T, E> default_err() noexcept
         {
-            return std::experimental::constexpr_move(result<T, E>(internal::placeholder{}, E()));
+            return std::move(result<T, E>(internal::placeholder{}, E()));
         }
 
         // Inspection.
@@ -132,159 +143,77 @@ namespace maybe {
             return is_ok();
         }
 
-#if OPTIONAL_HAS_MOVE_ACCESSORS == 1
-
         constexpr T const& ok_value() const&
         {
-            return var_ok.value();
+            if (!is_ok()) {
+                throw new bad_result_access("Attempted to ok from err");
+            }
+            return *var_ok;
         }
 
-        OPTIONAL_MUTABLE_CONSTEXPR T& ok_value() &
+        constexpr T& ok_value() &
         {
-            return var_ok.value();
+            if (!is_ok()) {
+                throw new bad_result_access("Attempted to ok from err");
+            }
+            return *var_ok;
         }
 
-        OPTIONAL_MUTABLE_CONSTEXPR T&& ok_value() &&
+        constexpr T&& ok_value() &&
         {
-            return std::move(var_ok.value());
+            if (!is_ok()) {
+                throw new bad_result_access("Attempted to ok from err");
+            }
+            return std::move(*var_ok);
         }
-
-#else
-
-        /**
-         * Retrieve ok value or throw `bad_optional_access` exception.
-         *
-         * @return T
-         */
-        constexpr T const& ok_value() const
-        {
-            return var_ok.value();
-        }
-
-        T& ok_value()
-        {
-            return var_ok.value();
-        }
-
-#endif
-
-#if OPTIONAL_HAS_THIS_RVALUE_REFS == 1
 
         template <class V>
         constexpr T ok_value_or(V&& v) const&
         {
-            return var_ok.value_or(std::experimental::constexpr_forward<V>(v));
+            return var_ok.value_or(std::forward<V>(v));
         }
 
-#if OPTIONAL_HAS_MOVE_ACCESSORS == 1
-
         template <class V>
-        OPTIONAL_MUTABLE_CONSTEXPR T ok_value_or(V&& v) &&
-        {
-            return var_ok.value_or(std::experimental::constexpr_forward<V>(v));
-        }
-
-#else
-
-        template <class V>
-        T ok_value_or(V&& v) &&
-        {
-            return var_ok.value_or(std::experimental::constexpr_forward<V>(v));
-        }
-
-#endif
-
-#else
-
-        /**
-         * Retrieve ok value or the provided default `V` which can be casted to `T`.
-         *
-         * @return T
-         */
-        template <class V>
-        constexpr T ok_value_or(V&& v) const
+        constexpr T ok_value_or(V&& v) &&
         {
             return var_ok.value_or(std::forward<V>(v));
         }
 
-#endif
-
-#if OPTIONAL_HAS_MOVE_ACCESSORS == 1
-
         constexpr E const& err_value() const&
         {
-            return var_err.value();
+            if (!is_err()) {
+                throw new bad_result_access("Attempted to err from ok");
+            }
+            return *var_err;
         }
 
-        OPTIONAL_MUTABLE_CONSTEXPR E& err_value() &
+        constexpr E& err_value() &
         {
-            return var_err.value();
+            if (!is_err()) {
+                throw new bad_result_access("Attempted to err from ok");
+            }
+            return *var_err;
         }
 
-        OPTIONAL_MUTABLE_CONSTEXPR E&& err_value() &&
+        constexpr E&& err_value() &&
         {
-            return std::move(var_err.value());
+            if (!is_err()) {
+                throw new bad_result_access("Attempted to err from ok");
+            }
+            return std::move(*var_err);
         }
-
-#else
-
-        /**
-         * Retrieve err value or throw `bad_optional_access` exception.
-         *
-         * @return E
-         */
-        constexpr E const& err_value() const
-        {
-            return var_err.value();
-        }
-
-        E& err_value()
-        {
-            return var_err.value();
-        }
-
-#endif
-
-#if OPTIONAL_HAS_THIS_RVALUE_REFS == 1
 
         template <class V>
         constexpr E err_value_or(V&& v) const&
         {
-            return var_err.value_or(std::experimental::constexpr_forward<V>(v));
-        }
-
-#if OPTIONAL_HAS_MOVE_ACCESSORS == 1
-
-        template <class V>
-        OPTIONAL_MUTABLE_CONSTEXPR E err_value_or(V&& v) &&
-        {
-            return var_err.value_or(std::experimental::constexpr_forward<V>(v));
-        }
-
-#else
-
-        template <class V>
-        E err_value_or(V&& v) &&
-        {
-            return var_err.value_or(std::experimental::constexpr_forward<V>(v));
-        }
-
-#endif
-
-#else
-
-        /**
-         * Retrieve err value or the provided default `V` which can be casted to `E`.
-         *
-         * @return E
-         */
-        template <class V>
-        E err_value_or(V&& v) const
-        {
             return var_err.value_or(std::forward<V>(v));
         }
 
-#endif
+        template <class V>
+        constexpr E err_value_or(V&& v) &&
+        {
+            return var_err.value_or(std::forward<V>(v));
+        }
 
         // Functional helpers.
 
@@ -445,7 +374,7 @@ namespace maybe {
          */
         constexpr static result<void, E> default_ok() noexcept
         {
-            return std::experimental::constexpr_move(result<void, E>());
+            return std::move(result<void, E>());
         }
 
         /**
@@ -455,7 +384,7 @@ namespace maybe {
          */
         constexpr static result<void, E> default_err() noexcept
         {
-            return std::experimental::constexpr_move(result<void, E>(E()));
+            return std::move(result<void, E>(E()));
         }
 
         // Inspection.
@@ -488,47 +417,33 @@ namespace maybe {
         void ok_value()
         {
             if (is_err()) {
-                throw std::experimental::bad_optional_access("bad optional access");
+                throw new bad_result_access("Attempted to get ok from err");
             }
         }
 
-#if OPTIONAL_HAS_MOVE_ACCESSORS == 1
-
         constexpr E const& err_value() const&
         {
-            return var_err.value();
+            if (!is_err()) {
+                throw new bad_result_access("Attempted to err from ok");
+            }
+            return *var_err;
         }
 
-        OPTIONAL_MUTABLE_CONSTEXPR E& err_value() &
+        constexpr E& err_value() &
         {
-            return var_err.value();
+            if (!is_err()) {
+                throw new bad_result_access("Attempted to err from ok");
+            }
+            return *var_err;
         }
 
-        OPTIONAL_MUTABLE_CONSTEXPR E&& err_value() &&
+        constexpr E&& err_value() &&
         {
-            return std::move(var_err.value());
+            if (!is_err()) {
+                throw new bad_result_access("Attempted to err from ok");
+            }
+            return std::move(*var_err);
         }
-
-#else
-
-        /**
-         * Retrieve err value or throw `bad_optional_access` exception.
-         *
-         * @return E
-         */
-        E const& err_value() const
-        {
-            return var_err.value();
-        }
-
-        E& err_value()
-        {
-            return var_err.value();
-        }
-
-#endif
-
-#if OPTIONAL_HAS_THIS_RVALUE_REFS == 1
 
         template <class V>
         constexpr E err_value_or(V&& v) const&
@@ -537,25 +452,10 @@ namespace maybe {
         }
 
         template <class V>
-        OPTIONAL_MUTABLE_CONSTEXPR E err_value_or(V&& v) &&
+        constexpr E err_value_or(V&& v) &&
         {
             return var_err.value_or(std::forward<V>(v));
         }
-
-#else
-
-        /**
-         * Retrieve err value or the provided default `V` which can be casted to `E`.
-         *
-         * @return E
-         */
-        template <class V>
-        E err_value_or(V&& v) const
-        {
-            return var_err.value_or(std::forward<V>(v));
-        }
-
-#endif
 
         // Functional helpers.
 
